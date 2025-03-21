@@ -32,4 +32,4 @@ export async function googleAuth() {
     }catch (error) {
         console.log(error );
     }
-}
+} 

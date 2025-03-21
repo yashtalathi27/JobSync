@@ -1,23 +1,48 @@
 import React, { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { googleAuth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 function Auth({ type }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState({ name: "", email: "", password: "" });
 
   function handleAuthForm(event) {
     event.preventDefault();
+    navigate('/signup/type');
   }
 
   async function handleGoogleAuth() {
-    await googleAuth();
+    try {
+      const data = await googleAuth();
+  
+      const accessToken = data.user.accessToken;
+      const res = await axios.post("http://localhost:5000/api/freelancer/register", {
+        accessToken,
+      });
+      // localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // dispatch(googleSlice(res.data.user));
+      // dispatch(login(res.data.user))
+      console.log(res.sucess);
+      
+      if (res.sucess) {
+        // toast.success(res.data.message);
+        navigate("/signup/type"); 
+      } else {
+        toast.error(res.data?.message);
+        navigate("/signin"); 
+      }
+    } catch (error) {
+      // Log and display an error if something goes wrong.
+      console.error("Error during Google Authentication:", error.response?.data || error.message);
+      toast.error("An error occurred during authentication. Please try again.");
+    }
   }
 
   return (
     <div className="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-8 m-20 text-center">
-      <h1 className="text-3xl font-bold text-gray-800">
-        Login
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
 
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleAuthForm}>
         {type === "signup" && (
@@ -40,8 +65,8 @@ function Auth({ type }) {
           placeholder="Enter your Password"
           onChange={(e) => setUser((prev) => ({ ...prev, password: e.target.value }))}
         />
-        <button className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
-          {type === "signin" ? "Login" : "Register"}
+        <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
+          Sign In
         </button>
       </form>
 

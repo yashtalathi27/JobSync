@@ -1,31 +1,112 @@
-import React from 'react'
-import { assets } from '../assets/assets'
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 
 const Header = () => {
-  return (
-    <div className="flex flex-col md:flex-row flex-wrap bg-primary rounded-lg px-6 md:px-10 lg:px-20">
-        {/* (left side) */}
-        <div className="md:w-1/2 flex flex-col items-start justify-center gap-4 py-10 m-auto md:py-[10vw] md:mb-[-30px]">
-            <div className="text-3xl md:text-4xl lg-text-5xl text-white font-semibold leading-tight md:leading-tight lg:leading-tight"><p>
-                Book Appointment <br/> With Trusted Doctors
-            </p>
-            </div>
-            <div className="flex flex-col md:flex-row items-center gap-3 text-white text-sm font-light">
-                <img className="w-28" src={assets.group_profiles} alt="" />
-                <p> Simply browse through our extensive list of trusted doctors,<br className="hidden sm:block"/>
-                    schedule your appointment hassle-free.
-                </p>
-            </div>
-            <a href="#speciality" className="flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300">
-                Book appointment<img className="w-3" src={assets.arrow_icon} alt="" />
-            </a>
-        </div>
-        {/* {right side} */}
-        <div className="md:w-1/2 relative">
-          <img className="w-full md:absolute bottom-0 h-auto rounded-lg"src={assets.header_img} alt=""/>
-        </div>
-    </div>
-  )
-}
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Simulating user authentication
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
-export default Header
+  return (
+    <header className="bg-blue-700 text-white shadow-md">
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold">
+          JobSync
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-6">
+          <Link to="/" className="hover:underline">Home</Link>
+          <Link to="/jobs" className="hover:underline">Find Jobs</Link>
+          <Link to="/post-job" className="hover:underline">Post a Job</Link>
+          <Link to="/about" className="hover:underline">About Us</Link>
+          <Link to="/contact" className="hover:underline">Contact</Link>
+        </nav>
+
+        {/* Auth Section */}
+        <div className="hidden md:flex space-x-4 items-center">
+          {isLoggedIn ? (
+            <div className="relative">
+              <button 
+                className="flex items-center space-x-2 hover:text-gray-300"
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
+                <FaUserCircle size={24} />
+                <span>Profile</span>
+              </button>
+
+              {/* Profile Dropdown */}
+              {showProfileDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg">
+                  <ul className="py-2">
+                    <li className="px-4 py-2 hover:bg-gray-200">
+                      <Link to="/dashboard">Dashboard</Link>
+                    </li>
+                    <li className="px-4 py-2 hover:bg-gray-200">
+                      <Link to="/settings">Settings</Link>
+                    </li>
+                    <li 
+                      className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => setIsLoggedIn(false)}
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className="bg-white text-blue-700 px-4 py-2 rounded-md font-semibold hover:bg-gray-200">
+                Login
+              </Link>
+              <Link to="/signup" className="bg-white text-blue-700 px-4 py-2 rounded-md font-semibold hover:bg-gray-200">
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-blue-800 text-white text-center py-4">
+          <Link to="/" className="block py-2" onClick={() => setMenuOpen(false)}>Home</Link>
+          <Link to="/jobs" className="block py-2" onClick={() => setMenuOpen(false)}>Find Jobs</Link>
+          <Link to="/post-job" className="block py-2" onClick={() => setMenuOpen(false)}>Post a Job</Link>
+          <Link to="/about" className="block py-2" onClick={() => setMenuOpen(false)}>About Us</Link>
+          <Link to="/contact" className="block py-2" onClick={() => setMenuOpen(false)}>Contact</Link>
+          
+          {/* Mobile Auth Buttons */}
+          {!isLoggedIn ? (
+            <>
+              <Link to="/login" className="block py-2 font-semibold text-blue-300 hover:text-white" onClick={() => setMenuOpen(false)}>
+                Login
+              </Link>
+              <Link to="/signup" className="block py-2 font-semibold text-blue-300 hover:text-white" onClick={() => setMenuOpen(false)}>
+                Sign Up
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/dashboard" className="block py-2" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <Link to="/settings" className="block py-2" onClick={() => setMenuOpen(false)}>Settings</Link>
+              <button className="block py-2 w-full text-left px-6 hover:text-red-500" onClick={() => setIsLoggedIn(false)}>
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Header;
