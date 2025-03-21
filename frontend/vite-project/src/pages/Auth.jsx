@@ -1,34 +1,16 @@
-import React from "react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { googleAuth } from "../utils/firebase";
+import React, { useState } from "react";
 
+import {googleAuth} from './utils/firebase'
 function Auth({ type }) {
   const [user, setUser] = useState({ name: "", email: "", password: "" });
-  const navigate = useNavigate();
 
-  async function handleAuthForm(event) {
+  function handleAuthForm(event) {
     event.preventDefault();
-    try {
-      const res = await axios.post(`http://localhost:8000/api/v1/${type}`, user);
-
-      if (res.data.success) {
-        toast.success(res.data.message);
-        navigate(type === "signup" ? "/signin" : "/");
-      }
-    } catch (error) {
-      toast.error("Internal server error");
-    }
   }
 
   async function handleGoogleAuth() {
-    try {
-      const data = await googleAuth();
-    } catch (error) {
-      toast.error("An error occurred during authentication.");
-    }
+    const data = await googleAuth();
+  
   }
 
   return (
@@ -64,15 +46,6 @@ function Auth({ type }) {
           <p className="text-1xl font-semibold mr-3">Continue with</p>
         </div>
       </form>
-      {type === "signin" ? (
-        <p>
-          Don't have an account? <a href="/signup">Sign Up</a>
-        </p>
-      ) : (
-        <p>
-          Already have an account? <a href="/signin">Sign In</a>
-        </p>
-      )}
     </div>
   );
 }
