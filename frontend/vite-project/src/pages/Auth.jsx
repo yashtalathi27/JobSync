@@ -1,23 +1,63 @@
 import React, { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { googleAuth } from "../utils/firebase";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Auth({ type }) {
   const [user, setUser] = useState({ name: "", email: "", password: "" });
-
-  function handleAuthForm(event) {
+  const navigate = useNavigate();
+  async function handleAuthForm(event) {
     event.preventDefault();
+    const res = await axios.post("http://localhost:5000/api/freelancer/login", {
+      email: user.email,
+      password: user.password,
+  });
+  console.log(res);
+  if (res.data?.success) {
+    toast.success(res.data.message);
+    navigate("/dashboard");
+  } else {
+    toast.error(res.data?.message);
+    navigate("/login");
   }
+}
 
   async function handleGoogleAuth() {
-    await googleAuth();
+    try {
+      const data = await googleAuth();
+
+      const accessToken = data.user.accessToken;
+      const res = await axios.post("http://localhost:5000/api/freelancer/google-auth", {
+        accessToken,
+      });
+      // localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // dispatch(googleSlice(res.data.user));
+      // dispatch(login(res.data.user))
+      console.log(res);
+
+      if (res.data?.sucess) {
+        // toast.success(res.data.message);
+        navigate("/dashboard");
+      } else {
+        // toast.error(res.data?.message);
+        navigate("/login");
+      }
+    } catch (error) {
+      // Log and display an error if something goes wrong.
+      console.error(
+        "Error during Google Authentication:",
+        error.response?.data || error.message
+      );
+      //toast.error("An error occurred during authentication. Please try again.");
+    }
   }
 
   return (
     <div className="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-8 m-20 text-center">
-      <h1 className="text-3xl font-bold text-gray-800">
-        Login
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-800">Login</h1>
 
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleAuthForm}>
         {type === "signup" && (
@@ -25,22 +65,28 @@ function Auth({ type }) {
             type="text"
             className="w-full bg-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Enter your Name"
-            onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))}
+            onChange={(e) =>
+              setUser((prev) => ({ ...prev, name: e.target.value }))
+            }
           />
         )}
         <input
           type="email"
           className="w-full bg-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Enter your Email"
-          onChange={(e) => setUser((prev) => ({ ...prev, email: e.target.value }))}
+          onChange={(e) =>
+            setUser((prev) => ({ ...prev, email: e.target.value }))
+          }
         />
         <input
           type="password"
           className="w-full bg-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Enter your Password"
-          onChange={(e) => setUser((prev) => ({ ...prev, password: e.target.value }))}
+          onChange={(e) =>
+            setUser((prev) => ({ ...prev, password: e.target.value }))
+          }
         />
-        <button className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
+        <button onSubmit={handleAuthForm} className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
           {type === "signin" ? "Login" : "Register"}
         </button>
       </form>

@@ -10,6 +10,7 @@ import Auth from './pages/Auth.jsx';
 import SignIn from './pages/SignIn.jsx';
 import FreelancerSignup from './pages/SignupFreeLancer.jsx';
 import SignInType from './pages/SignInType.jsx';
+import {Toaster} from 'react-hot-toast';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <Provider store={store}> */}
+    <Toaster/>
     <RouterProvider router={router}/>
     {/* </Provider> */}
   </StrictMode>,

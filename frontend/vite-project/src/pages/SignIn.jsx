@@ -2,13 +2,20 @@ import React, { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { googleAuth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Auth({ type }) {
   const navigate = useNavigate();
   const [user, setUser] = useState({ name: "", email: "", password: "" });
 
-  function handleAuthForm(event) {
+  async function handleAuthForm(event) {
     event.preventDefault();
+    const res = await axios.post("http://localhost:5000/api/freelancer/register", {
+      email: user.email,
+      password  : user.password,
+    });
+    console.log(res);
+    
     navigate('/signup/type');
   }
 
@@ -17,26 +24,26 @@ function Auth({ type }) {
       const data = await googleAuth();
   
       const accessToken = data.user.accessToken;
-      const res = await axios.post("http://localhost:5000/api/freelancer/register", {
+      const res = await axios.post("http://localhost:5000/api/freelancer/google-auth", {
         accessToken,
       });
       // localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // dispatch(googleSlice(res.data.user));
       // dispatch(login(res.data.user))
-      console.log(res.sucess);
+      console.log(res);
       
-      if (res.sucess) {
+      if (res) {
         // toast.success(res.data.message);
         navigate("/signup/type"); 
       } else {
-        toast.error(res.data?.message);
+        //toast.error(res.data?.message);
         navigate("/signin"); 
       }
     } catch (error) {
       // Log and display an error if something goes wrong.
       console.error("Error during Google Authentication:", error.response?.data || error.message);
-      toast.error("An error occurred during authentication. Please try again.");
+      //toast.error("An error occurred during authentication. Please try again.");
     }
   }
 

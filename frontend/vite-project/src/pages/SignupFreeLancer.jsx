@@ -26,9 +26,9 @@ const FreelancerSignup = () => {
 
   async function handleForm(){
     try {
-        const res=await axios.post('http://localhost:5000/api/freelancer/register',formData)
+        const res=await axios.post('http://localhost:5000/api/freelancer/update',formData)
 
-        // console.log(res.data)
+        console.log(res)
         if(res.sucess=='true'){
             console.log('User Registered')
             navigate('/dashboard')  
