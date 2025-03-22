@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
-import { googleAuth } from "../utils/firebase";
+import { googleAuth } from "../../utils/firebase";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";

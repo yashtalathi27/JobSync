@@ -6,11 +6,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 import Home from './pages/Home';
-import Auth from './pages/Auth.jsx';
-import SignIn from './pages/SignIn.jsx';
-import FreelancerSignup from './pages/SignupFreeLancer.jsx';
-import SignInType from './pages/SignInType.jsx';
+import Auth from './pages/auth/Auth.jsx';
+import SignIn from './pages/auth/SignIn.jsx';
+import FreelancerSignup from './pages/auth/SignupFreeLancer.jsx';
+import SignInType from './pages/auth/SignInType.jsx';
 import {Toaster} from 'react-hot-toast';
+import FreelancerDashboard from './pages/FreeLancerdashboard/FreelancerDash.jsx';
+import ProjectDetails from './pages/FreeLancerdashboard/ProjectDetails.jsx';
+import OrganizerDashboard from './pages/OrgainzerDashboard/OrgainzerDashboard.jsx';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +39,18 @@ const router = createBrowserRouter([
       {
         path: "/signup/freelancer",
         element: <FreelancerSignup />
+      },
+      {
+        path: "/dashboard/freelancer",
+        element: <FreelancerDashboard />
+      },
+      {
+        path: "/project/free/:id",
+        element: <ProjectDetails />
+      },
+      {
+        path: "/project/org",
+        element: <OrganizerDashboard />
       }
     ]
   }

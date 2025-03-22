@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import skillsData from "../skills.json";
+import skillsData from "../../skills.json";
 import axios from "axios";
 
 const FreelancerSignup = () => {
@@ -31,7 +31,7 @@ const FreelancerSignup = () => {
         console.log(res)
         if(res.sucess=='true'){
             console.log('User Registered')
-            navigate('/dashboard')  
+            navigate('/dashboard/freelancer')  
         }
 
     } catch (error) {
