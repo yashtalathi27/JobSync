@@ -41,7 +41,7 @@ const Banner = () => {
     <div className="relative w-full h-80 bg-gray-100 overflow-hidden rounded-lg shadow-md">
       <div className="absolute left-0 top-0 h-full w-1/3 flex items-center justify-center">
         <img 
-          src="/api/placeholder/400/500" 
+          src="/" 
           alt="Left banner image" 
           className="max-h-full max-w-full object-contain"
         />

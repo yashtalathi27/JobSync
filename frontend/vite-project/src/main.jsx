@@ -15,6 +15,7 @@ import FreelancerDashboard from './pages/FreeLancerdashboard/FreelancerDash.jsx'
 import ProjectDetails from './pages/FreeLancerdashboard/ProjectDetails.jsx';
 import OrganizerDashboard from './pages/OrgainzerDashboard/OrgainzerDashboard.jsx';
 import AdminDashboard from './pages/OrgainzerDashboard/AdminDash.jsx';
+import CreateProject from './pages/OrgainzerDashboard/AddProject.jsx';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "/org/admin",
         element: <AdminDashboard />
+      },
+      {
+        path: "/org/admin/addproject",
+        element: <CreateProject />
       }
     ]
   }
