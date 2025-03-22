@@ -83,7 +83,7 @@ const FreelancerSignup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    navigate("/dashboard");
+    navigate("/dashboard/freelancer");
   };
 
   return (

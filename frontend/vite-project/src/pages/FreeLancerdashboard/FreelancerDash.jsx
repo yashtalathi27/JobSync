@@ -75,7 +75,7 @@ export default function FreelancerDashboard() {
         {DUMMY_DATA.activeProjects.map((project) => (
           <div
             key={project.id}
-            onClick={() => navigate(`/project/${project.id}`, { state: { project } })}
+            onClick={() => navigate(`/project/free/${project.id}`, { state: { project } })}
             className="cursor-pointer"
           >
             <ActiveProject {...project} />
