@@ -14,6 +14,7 @@ import {Toaster} from 'react-hot-toast';
 import FreelancerDashboard from './pages/FreeLancerdashboard/FreelancerDash.jsx';
 import ProjectDetails from './pages/FreeLancerdashboard/ProjectDetails.jsx';
 import OrganizerDashboard from './pages/OrgainzerDashboard/OrgainzerDashboard.jsx';
+import AdminDashboard from './pages/OrgainzerDashboard/AdminDash.jsx';
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "/project/org",
         element: <OrganizerDashboard />
+      },
+      {
+        path: "/org/admin",
+        element: <AdminDashboard />
       }
     ]
   }
