@@ -1,6 +1,7 @@
 const Organization=require('../Model/organizationSchema');
 const bcrypt=require('bcrypt');
 const saltRounds=10;
+const Project=require('../Model/projectSchema');
 
 const registerOrg=async(req, res)=>{
     console.log(req.body);
@@ -58,11 +59,14 @@ const loginOrg=async(req,res)=>{
 
 const createProject=async(req,res)=>{
       console.log(req.body);
-      const name=req.body.name;
-      const description=req.body.description;
-      const freelancer=req.body.freelancer;
-      const organization=req.body.organization;
-      const employee=req.body.employee;
+      const name=req.body.projectData.name;
+      const description=req.body.projectData.description;
+      const freelancer=req.body.projectData.freelancerId;
+      const organization=req.body.projectData.organization;
+      const employee=req.body.projectData.employeeId;
+
+      console.log(name, description, freelancer, organization, employee);
+      
       try{
             const project=new Project({
                   name: name,
@@ -71,9 +75,9 @@ const createProject=async(req,res)=>{
                   organization: organization,
                   employee: employee,
                   budget: req.body.budget,
-                  checkpoints: req.body.checkpoints,
-                  createdAt: req.body.createdAt,
-                  deadline: req.body.deadline,
+                  checkpoints: req.body.projectData.checkpoints,
+                  createdAt: req.body.projectData.createdAt,
+                  deadline: req.body.projectData.deadline,
 
             });
             await project.save();

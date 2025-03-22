@@ -16,6 +16,8 @@ import ProjectDetails from './pages/FreeLancerdashboard/ProjectDetails.jsx';
 import OrganizerDashboard from './pages/OrgainzerDashboard/OrgainzerDashboard.jsx';
 import AdminDashboard from './pages/OrgainzerDashboard/AdminDash.jsx';
 import CreateProject from './pages/OrgainzerDashboard/AddProject.jsx';
+import OrgSignup from './pages/OrgainzerDashboard/AdminSignup.jsx';
+import EmployeeSignup from './pages/OrgainzerDashboard/EmployeeSignUp.jsx';
 
 const router = createBrowserRouter([
   {
@@ -55,12 +57,20 @@ const router = createBrowserRouter([
         element: <OrganizerDashboard />
       },
       {
-        path: "/org/admin",
+        path: "/admin/dashboard",
         element: <AdminDashboard />
       },
       {
         path: "/org/admin/addproject",
         element: <CreateProject />
+      },
+      {  
+        path: "/signup/org",
+        element: <OrgSignup />
+      },
+      {
+        path: "signup/emp",
+        element: <EmployeeSignup />
       }
     ]
   }

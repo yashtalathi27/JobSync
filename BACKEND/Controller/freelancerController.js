@@ -1,3 +1,4 @@
+const { get } = require("mongoose");
 const Freelancer = require("../Model/freelancerSchema");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -99,5 +100,19 @@ const loginFreeLancer = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+// async function getFreeLancerByID(req, res) {
+//   const id = req.params.id;
+//   try {
+//     const freelancer = await Freelancer.findById(id);
+//     res.status(200).json(freelancer);
+//   } catch (error) {
+//     console.error("Error getting freelancer:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+//   try {
+//     const existingFreelancer = await Freel
+//   }
+// }
 
 module.exports = { registerFreelancer, updateFreelancer,loginFreeLancer };

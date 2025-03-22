@@ -3,36 +3,40 @@ const mongoose=require('mongoose');
 const projectSchema=new mongoose.Schema({
     name:{
         type: String,
-        required: true,
+        required: false,
     },
     description:{
         type: String,
-        required: true,
+        required: false,
     },
     freelancer:
     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'freelancers',
+      type:String,
+      required:false,
     },
     orgnization:
     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'organizations',
+      type:String,
+      required:false,
     },
     employee:
     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'employees',
+      type:String,
+      required:false,
     },
     budget: 
-    { type: Number, 
-      required: true 
+    { type: String, 
+      required: false 
     }, // Total budget for the freelancer
+    status: 
+    { type: Boolean, 
+      default: false 
+    }, // Status of the project
   checkpoints: [
     {
-      title: { type: String, required: true }, // Name of the checkpoint
+      title: { type: String, required: false }, // Name of the checkpoint
       description: { type: String }, // Details of the work
-      amount: { type: Number, required: true }, // Payment for this checkpoint
+      amount: { type: Number, required: false }, // Payment for this checkpoint
       completed: { type: Boolean, default: false }, // Status of the checkpoint
       completionDate: { type: Date }, // Expected completion date
     },

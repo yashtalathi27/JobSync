@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
 
 // Selection Modal component remains unchanged
 const SelectionModal = ({ isOpen, title, options, onSelect, onClose }) => {
@@ -100,7 +101,10 @@ export default function CreateProject() {
   // State for modals
   const [showFreelancerModal, setShowFreelancerModal] = useState(false);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-
+  const orgDetails = JSON.parse(localStorage.getItem("orgDetails") || "{}");
+  const organization = orgDetails.code || "";
+  console.log(organization);
+  
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -108,10 +112,11 @@ export default function CreateProject() {
     employee: "",
     budget: "",
     deadline: new Date(),
-    organization: localStorage.getItem("organizationId") || "",
+    organization: organization,
   });
 
   // Fetch freelancers and employees data
+
   useEffect(() => {
     // Hardcoded freelancer data with new ID format
     setFreelancers([
@@ -288,12 +293,16 @@ export default function CreateProject() {
         completed: false
       }))
     };
+
+    console.log("Submitting project:", projectData);
+    const res=await axios.post("http://localhost:5000/api/organization/createProject",
+    { projectData }); 
+    console.log(res);
     
     // API call would go here
-    console.log("Submitting project:", projectData);
     
     // Navigate back to projects list after successful creation
-    navigate("/org/admin");
+    // navigate("/org/admin");
     
     // For demo purposes, just show success message
     alert("Project created successfully!");
@@ -529,9 +538,9 @@ export default function CreateProject() {
                 ${checkpoints.reduce((sum, cp) => sum + Number(cp.amount || 0), 0)} of ${formData.budget} allocated
               </div>
             )}
+            
           </div>
-          
-          {/* Submit Buttons */}
+         {/* Submit Buttons */}
           <div className="flex justify-end gap-3 mt-8">
             <button
               type="button"

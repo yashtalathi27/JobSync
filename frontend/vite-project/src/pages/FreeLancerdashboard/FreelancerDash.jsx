@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import OverviewCard from "./OverviewCard";
 import ActiveProject from "./ActiveProject";
 import RecentMessages from "./RecentMessages";
+import { useEffect } from "react";
 
 const DUMMY_DATA = {
   overview: [
@@ -54,6 +55,16 @@ const DUMMY_DATA = {
     { sender: "Client XYZ", message: "Please send the final invoice.", time: "2 days ago" },
   ],
 };
+
+async function fetchFreelancerData() {
+  // Fetch data from the API
+  const res=await axios.get('http://localhost:5000/freelancer/dashboard');
+  console.log(res.data);
+}
+
+useEffect(() => { 
+  fetchFreelancerData();
+}, []);
 
 export default function FreelancerDashboard() {
   const navigate = useNavigate();
