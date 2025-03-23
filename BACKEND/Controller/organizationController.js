@@ -5,6 +5,7 @@ const Project=require('../Model/projectSchema');
 
 const registerOrg=async(req, res)=>{
     console.log(req.body);
+    const name=req.body.name;
     const email=req.body.workEmail;
     const password=req.body.password;
     try{
@@ -15,6 +16,7 @@ const registerOrg=async(req, res)=>{
           }
           const hashed=await bcrypt.hash(password, saltRounds);
           const org= new Organization({
+                name: name,
                 workEmail: email,
                 password: hashed,
                   name: req.body.name,
@@ -28,7 +30,7 @@ const registerOrg=async(req, res)=>{
           res 
               .status(201).json({message: "Organization registered successfully", success: true});
        }
-       catch(errror)
+       catch(error)
        {
            console.log("Registration error: ", errror);
             res.status(500).json({message: "Internal Server Error"});
@@ -83,25 +85,27 @@ const loginOrg=async(req,res)=>{
 
 const createProject=async(req,res)=>{
       console.log(req.body);
-      const name=req.body.projectData.name;
-      const description=req.body.projectData.description;
-      const freelancer=req.body.projectData.freelancerId;
-      const organization=req.body.projectData.organization;
-      const employee=req.body.projectData.employeeId;
+      const id= req.body.projectId;
+      const name=req.body.name;
+      const description=req.body.description;
+      const freelancer=req.body.freelancer;
+      const organization=req.body.organization;
+      const employee=req.body.employee;
 
-      console.log(name, description, freelancer, organization, employee);
-      
+      console.log(id, name, description, freelancer, organization, employee);
       try{
             const project=new Project({
+                  projectId: id,
                   name: name,
                   description: description,
                   freelancer: freelancer,
                   organization: organization,
                   employee: employee,
                   budget: req.body.budget,
-                  checkpoints: req.body.projectData.checkpoints,
-                  createdAt: req.body.projectData.createdAt,
-                  deadline: req.body.projectData.deadline,
+                  total_checkpoints: req.body.total_checkpoints,
+                  checkpoints: req.body.checkpoints,
+                  createdAt: req.body.createdAt,
+                  deadline: req.body.deadline,
 
             });
             await project.save();

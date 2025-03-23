@@ -3,6 +3,7 @@ const connectDB = require("./config/dbConnection");
 const { PORT } = require("./config/dotenv");
 const freelancerRoutes = require("./Routes/freelancerRoutes");
 const organizationRoutes = require("./Routes/organizationRoutes");
+const employeeRoutes=require("./Routes/employeeRoutes");
 const cors = require("cors");
 
 const app = express();
