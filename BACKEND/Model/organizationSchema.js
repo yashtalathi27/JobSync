@@ -11,7 +11,6 @@ const orgSchema = new mongoose.Schema({
   requestCode: {
     type: String,
     unique: true,
-    default: () => Math.floor(100000 + Math.random() * 900000).toString(),
   },
   employees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Employee" }],
 });

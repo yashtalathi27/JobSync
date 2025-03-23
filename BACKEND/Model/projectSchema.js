@@ -1,6 +1,11 @@
 const mongoose=require('mongoose');
 
 const projectSchema=new mongoose.Schema({
+  projectId: {
+    type: String,
+    unique: true,
+    default: () => Math.random().toString(36).substring(2,9),// Auto-generated project ID
+       },
     name:{
         type: String,
         required: false,
@@ -32,6 +37,15 @@ const projectSchema=new mongoose.Schema({
     { type: Boolean, 
       default: false 
     }, // Status of the project
+    total_checkpoints: 
+    { type: Number, 
+      required: true,
+      minimum:1,
+    }, // Total number of checkpoints
+    completed_checkpoints: 
+    { type: Number, 
+      default: 0 
+    },
   checkpoints: [
     {
       title: { type: String, required: false }, // Name of the checkpoint
