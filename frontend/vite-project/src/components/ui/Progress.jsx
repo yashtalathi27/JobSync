@@ -8,11 +8,11 @@ const Progress = ({ value, max = 100, checkpoints = [] }) => {
         {checkpoints.map((checkpoint, index) => (
           <div key={index} className="absolute flex flex-col items-center text-xs text-gray-700"
             style={{
-              left: `calc(${checkpoint.value}% - 10px)`,
+              left: `calc(${checkpoint.length}% - 10px)`,
               top: "-16px",
               whiteSpace: "nowrap",
             }}>
-            <span className="mt-2">{checkpoint.label}</span>
+            <span className="mt-2">{checkpoint.title}</span>
             {/* Vertical Line */}
             <div className="w-[2px] h-5 bg-gray-500 mt-1"></div>
           </div>

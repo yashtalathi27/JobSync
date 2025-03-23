@@ -6,7 +6,7 @@ const Project=require('../Model/projectSchema');
 const registerOrg=async(req, res)=>{
     console.log(req.body);
     const email=req.body.workEmail;
-    const password=req.body.pasword;
+    const password=req.body.password;
     try{
           const CheckResult=await Organization.find({workEmail: email});
           if(CheckResult.length>0)
@@ -17,6 +17,12 @@ const registerOrg=async(req, res)=>{
           const org= new Organization({
                 workEmail: email,
                 password: hashed,
+                  name: req.body.name,
+                  websiteLink: req.body.websiteLink,
+                  profilePicture: req.body.profilePicture,
+                  description: req.body.description,
+                  requestCode: req.body.requestCode,
+                  // orgId: req.body.orgId,
           });
           await org.save();
           res 
@@ -24,10 +30,28 @@ const registerOrg=async(req, res)=>{
        }
        catch(errror)
        {
-           console.log("Registration error: ", error);
+           console.log("Registration error: ", errror);
             res.status(500).json({message: "Internal Server Error"});
        }
 };
+
+async function verifyOrgCode(req, res) {  
+      const requestCode = req.body.orgCode;
+      try {
+        const org = await Organization.findOne({
+          requestCode: requestCode,
+        }); 
+            if (org) {
+            res.status(200).json({ message: "Code verified", success: true });
+            } else {
+            res.status(404).json({ message: "Code not found" });
+            }     
+      }
+      catch (error) {
+        console.error("Error during verification:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+      }
 
 const loginOrg=async(req,res)=>{
       console.log(req.body);
@@ -89,8 +113,11 @@ const createProject=async(req,res)=>{
       }
 };
 
+
+
 module.exports={
     registerOrg,
     loginOrg,
     createProject,
+    verifyOrgCode,
 };

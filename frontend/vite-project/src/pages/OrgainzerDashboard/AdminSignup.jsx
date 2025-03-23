@@ -1,25 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function OrgSignup() {
   const navigate = useNavigate();
   
   // Form state
-  const [orgName, setOrgName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [contact, setContact] = useState("");
-  const [industry, setIndustry] = useState("");
+  const [name, setName] = useState("");
+  const [workEmail, setWorkEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [websiteLink, setWebsiteLink] = useState("");
+  const [description, setDescription] = useState("");
   
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [orgCode, setOrgCode] = useState("");
+  const [requestCode, setRequestCode] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [codeConfirmed, setCodeConfirmed] = useState(false);
   
-  // Generate a unique organization code
-  const generateOrgCode = () => {
+  // Generate a unique organization request code
+  const generateRequestCode = () => {
     return "ORG" + Math.random().toString(36).substring(2, 8).toUpperCase();
   };
   
@@ -27,23 +29,27 @@ function OrgSignup() {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!orgName.trim()) newErrors.orgName = "Organization name is required";
+    if (!name.trim()) newErrors.name = "Organization name is required";
     
-    if (!adminEmail.trim()) {
-      newErrors.adminEmail = "Admin email is required";
-    } else if (!/\S+@\S+\.\S+/.test(adminEmail)) {
-      newErrors.adminEmail = "Please enter a valid email address";
+    if (!workEmail.trim()) {
+      newErrors.workEmail = "Work email is required";
+    } else if (!/\S+@\S+\.\S+/.test(workEmail)) {
+      newErrors.workEmail = "Please enter a valid email address";
     }
     
-    if (!address.trim()) newErrors.address = "Address is required";
-    
-    if (!contact.trim()) {
-      newErrors.contact = "Contact number is required";
-    } else if (!/^\d{10}$/.test(contact.replace(/[^0-9]/g, ''))) {
-      newErrors.contact = "Please enter a valid 10-digit contact number";
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
     }
     
-    if (!industry.trim()) newErrors.industry = "Industry type is required";
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    
+    if (websiteLink && !/^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(websiteLink)) {
+      newErrors.websiteLink = "Please enter a valid website URL";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,31 +62,52 @@ function OrgSignup() {
     setIsLoading(true);
     
     try {
-      const code = generateOrgCode();
-      setOrgCode(code);
+      const code = generateRequestCode();
+      setRequestCode(code);
       
-      const orgDetails = {
-        name: orgName,
-        code,
-        adminEmail,
-        address,
-        contact,
-        industry,
-        createdAt: new Date()
+      const orgData = {
+        name,
+        workEmail,
+        password,
+        websiteLink,
+        description,
+        requestCode: code,
+        orgId: code,
+        joiningDate: new Date()
       };
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Make API call to backend
+      const response = await axios.post('http://localhost:5000/api/organization/register', orgData);
       
-      // Store in localStorage for demo purposes (replace with actual API call)
-      localStorage.setItem("orgDetails", JSON.stringify(orgDetails));
+      // Store response data (avoid storing password in local storage in production)
+      const safeOrgData = {
+        ...response.data,
+        password: undefined // Remove password from localStorage
+      };
+      
+      localStorage.setItem("orgDetails", JSON.stringify(safeOrgData));
       
       // Show code confirmation dialog
       setShowConfirmation(true);
       
     } catch (error) {
       console.error("Error registering organization:", error);
-      setErrors({ submit: "Failed to register organization. Please try again." });
+      
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with an error status
+        if (error.response.status === 409) {
+          setErrors({ workEmail: "This email is already registered" });
+        } else {
+          setErrors({ submit: error.response.data.message || "Failed to register organization. Please try again." });
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        setErrors({ submit: "No response from server. Please check your connection and try again." });
+      } else {
+        // Something else happened while setting up the request
+        setErrors({ submit: "Failed to register organization. Please try again." });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +119,7 @@ function OrgSignup() {
     
     // Navigate to dashboard after a brief delay
     setTimeout(() => {
-      navigate("/admin/dashboard", { 
+      navigate(`/admin/dashboard/`, { 
         state: { 
           orgDetails: JSON.parse(localStorage.getItem("orgDetails"))
         } 
@@ -102,7 +129,7 @@ function OrgSignup() {
   
   // Copy code to clipboard
   const copyCodeToClipboard = () => {
-    navigator.clipboard.writeText(orgCode)
+    navigator.clipboard.writeText(requestCode)
       .then(() => {
         alert("Organization code copied to clipboard!");
       })
@@ -120,65 +147,69 @@ function OrgSignup() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
             <input
-              className={`w-full border ${errors.orgName ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
+              className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
               placeholder="Enter organization name"
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
-            {errors.orgName && <p className="mt-1 text-sm text-red-600">{errors.orgName}</p>}
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Work Email</label>
             <input
               type="email"
-              className={`w-full border ${errors.adminEmail ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
-              placeholder="admin@company.com"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
+              className={`w-full border ${errors.workEmail ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
+              placeholder="work@company.com"
+              value={workEmail}
+              onChange={(e) => setWorkEmail(e.target.value)}
             />
-            {errors.adminEmail && <p className="mt-1 text-sm text-red-600">{errors.adminEmail}</p>}
+            {errors.workEmail && <p className="mt-1 text-sm text-red-600">{errors.workEmail}</p>}
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
-              className={`w-full border ${errors.address ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
-              placeholder="Organization address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              type="password"
+              className={`w-full border ${errors.password ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-            {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
             <input
-              className={`w-full border ${errors.contact ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
-              placeholder="10-digit contact number"
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
+              type="password"
+              className={`w-full border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            {errors.contact && <p className="mt-1 text-sm text-red-600">{errors.contact}</p>}
+            {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Industry Type</label>
-            <select
-              className={`w-full border ${errors.industry ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white`}
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-            >
-              <option value="">Select industry type</option>
-              <option value="Technology">Technology</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Finance">Finance</option>
-              <option value="Education">Education</option>
-              <option value="Manufacturing">Manufacturing</option>
-              <option value="Retail">Retail</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.industry && <p className="mt-1 text-sm text-red-600">{errors.industry}</p>}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Website Link (Optional)</label>
+            <input
+              className={`w-full border ${errors.websiteLink ? 'border-red-500' : 'border-gray-300'} p-3 rounded-md focus:ring-blue-500 focus:border-blue-500`}
+              placeholder="https://yourcompany.com"
+              value={websiteLink}
+              onChange={(e) => setWebsiteLink(e.target.value)}
+            />
+            {errors.websiteLink && <p className="mt-1 text-sm text-red-600">{errors.websiteLink}</p>}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+            <textarea
+              className="w-full border border-gray-300 p-3 rounded-md focus:ring-blue-500 focus:border-blue-500 min-h-24"
+              placeholder="Tell us about your organization..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            ></textarea>
           </div>
           
           {errors.submit && (
@@ -210,10 +241,10 @@ function OrgSignup() {
           <div className="bg-green-50 p-6 rounded-lg border border-green-200">
             <h3 className="text-xl font-semibold text-green-700 text-center">Registration Successful!</h3>
             <div className="mt-4 p-4 bg-white rounded-md border border-green-200">
-              <p className="text-gray-600 text-center mb-2">Your Organization Code:</p>
+              <p className="text-gray-600 text-center mb-2">Your Organization Request Code:</p>
               <div className="flex items-center justify-center">
                 <span className="text-xl font-mono font-bold bg-blue-50 px-4 py-2 rounded border border-blue-200">
-                  {orgCode}
+                  {requestCode}
                 </span>
                 <button 
                   onClick={copyCodeToClipboard} 
@@ -229,10 +260,10 @@ function OrgSignup() {
             
             <div className="mt-4 text-center">
               <p className="text-gray-700 font-medium">
-                Please write down or save this code. You'll need it for future logins.
+                Please write down or save this code. You'll need it for future reference.
               </p>
               <p className="text-sm text-gray-600 mt-1">
-                This code is also used for inviting team members to your organization.
+                This code is also used for inviting employees to your organization.
               </p>
             </div>
           </div>
@@ -243,7 +274,7 @@ function OrgSignup() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <p className="text-yellow-700">
-                Have you saved your organization code? You will need this code to access your admin dashboard and to invite team members.
+                Have you saved your organization request code? You will need this code to access your admin dashboard and to invite employees.
               </p>
             </div>
           </div>

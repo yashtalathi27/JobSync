@@ -2,6 +2,7 @@ const { get } = require("mongoose");
 const Freelancer = require("../Model/freelancerSchema");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const Project = require("../Model/projectSchema");
 
 const registerFreelancer = async (req, res) => {
   console.log(req.body);
@@ -40,6 +41,7 @@ const updateFreelancer = async (req, res) => {
       name: req.body.name ?? existingFreelancer.name,
       email: req.body.email ?? existingFreelancer.email,
       skills: req.body.skills ?? existingFreelancer.skills,
+      freelancerId: req.body.freelancerId ?? existingFreelancer.freelancerId,
       address: {
         country: req.body.country ?? existingFreelancer.address.country,
         city: req.body.city ?? existingFreelancer.address.city,
@@ -101,18 +103,29 @@ const loginFreeLancer = async (req, res) => {
     }
 }
 
-// async function getFreeLancerByID(req, res) {
-//   const id = req.params.id;
-//   try {
-//     const freelancer = await Freelancer.findById(id);
-//     res.status(200).json(freelancer);
-//   } catch (error) {
-//     console.error("Error getting freelancer:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-//   try {
-//     const existingFreelancer = await Freel
-//   }
-// }
+async function getFreeLancerByID(req, res) {
+  const id = req.params.id;
+  try {
+    const freelancer = await Freelancer.find({freelancer:id});
+    res.status(200).json(freelancer);
+  } catch (error) {
+    console.error("Error getting freelancer:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 
-module.exports = { registerFreelancer, updateFreelancer,loginFreeLancer };
+async function getFreeLancerProjects(req, res) {
+  const id = req.params.id;
+  console.log("Freelancer ID:", id);
+  
+  try {
+    // const freelancer = await Freelancer.findById({freelancer: id});
+    const projects = await Project.find({ freelancer: id });  
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error("Error getting freelancer projects:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+module.exports = { registerFreelancer, updateFreelancer,loginFreeLancer,getFreeLancerByID,getFreeLancerProjects };

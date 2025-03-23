@@ -1,73 +1,36 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import OverviewCard from "./OverviewCard";
 import ActiveProject from "./ActiveProject";
 import RecentMessages from "./RecentMessages";
-import { useEffect } from "react";
-
-const DUMMY_DATA = {
-  overview: [
-    { type: "projects", title: "Total Projects", value: 12 },
-    { type: "earnings", title: "Total Earnings", value: "$5,200" },
-    { type: "completed", title: "Completed Jobs", value: 8 },
-    { type: "hours", title: "Total Hours Worked", value: 120 },
-  ],
-  activeProjects: [
-    {
-      id: 1,
-      title: "Website Redesign",
-      progress: 80,
-      hoursWorked: 45,
-      deadline: "April 10, 2025",
-      checkpoints: [
-        { value: 20, label: "Wireframe" },
-        { value: 50, label: "UI Design" },
-        { value: 80, label: "Development" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Mobile App Development",
-      progress: 60,
-      hoursWorked: 30,
-      deadline: "May 5, 2025",
-      checkpoints: [
-        { value: 30, label: "Prototype" },
-        { value: 60, label: "Beta Release" },
-        { value: 100, label: "Final Launch" },
-      ],
-    },
-    {
-      id: 3,
-      title: "SEO Optimization",
-      progress: 40,
-      hoursWorked: 20,
-      deadline: "March 28, 2025",
-      checkpoints: [
-        { value: 10, label: "Keyword Research" },
-        { value: 40, label: "Content Update" },
-        { value: 80, label: "Technical SEO" },
-      ],
-    },
-  ],
-  messages: [
-    { sender: "John Doe", message: "Can we discuss the design changes?", time: "10:30 AM" },
-    { sender: "Jane Smith", message: "Great job on the last project!", time: "Yesterday" },
-    { sender: "Client XYZ", message: "Please send the final invoice.", time: "2 days ago" },
-  ],
-};
-
-async function fetchFreelancerData() {
-  // Fetch data from the API
-  const res=await axios.get('http://localhost:5000/freelancer/dashboard');
-  console.log(res.data);
-}
-
-useEffect(() => { 
-  fetchFreelancerData();
-}, []);
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function FreelancerDashboard() {
   const navigate = useNavigate();
+  const { id } = useParams(); // ✅ Get ID first
+  const [projects, setProjects] = useState([]); // ✅ Store API response in state
+
+  async function fetchFreelancerData() {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/freelancer/${id}/projects`);
+      setProjects(res.data); // ✅ Store fetched data
+    } catch (error) {
+      console.error("Error fetching freelancer data:", error);
+    }
+  }
+
+  async function fetchFreelancer(){
+    try{
+      const res = await axios.get(`http://localhost:5000/api/freelancer/${id}`);
+      console.log(res.data);
+    }catch(error){
+      console.error("Error fetching freelancer data:", error);
+    }
+  }
+
+  useEffect(() => {
+    if (id) fetchFreelancerData();
+  }, [id]); // ✅ Run effect when `id` changes
 
   return (
     <div className="p-6 space-y-6">
@@ -75,7 +38,7 @@ export default function FreelancerDashboard() {
 
       {/* Overview Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {DUMMY_DATA.overview.map((item, index) => (
+        {projects.map((item, index) => (
           <OverviewCard key={index} {...item} />
         ))}
       </div>
@@ -83,10 +46,10 @@ export default function FreelancerDashboard() {
       {/* Active Projects Section */}
       <h2 className="text-xl font-semibold mt-4">Active Projects</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {DUMMY_DATA.activeProjects.map((project) => (
+        {projects.map((project) => (
           <div
-            key={project.id}
-            onClick={() => navigate(`/project/free/${project.id}`, { state: { project } })}
+            key={project._id} // ✅ Use `_id` from MongoDB instead of `id`
+            onClick={() => navigate(`/project/free/${project._id}`, { state: { project } })}
             className="cursor-pointer"
           >
             <ActiveProject {...project} />
@@ -96,7 +59,7 @@ export default function FreelancerDashboard() {
 
       {/* Recent Messages Section */}
       <h2 className="text-xl font-semibold mt-4">Recent Messages</h2>
-      <RecentMessages messages={DUMMY_DATA.messages} />
+      <RecentMessages messages={[]} />
     </div>
   );
 }

@@ -16,5 +16,7 @@ app.use(express.json()); // Parse JSON request bodies
 // Routes
 app.use("/api/freelancer", freelancerRoutes);
 app.use("/api/organization", organizationRoutes);
+app.use("/api/employee", organizationRoutes);
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

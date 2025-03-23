@@ -9,6 +9,10 @@ const freelancerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  freelancerId:{
+    type:String,
+    required:false,
+  },
   email: {
     type: String,
     required: true,

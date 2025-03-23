@@ -18,6 +18,7 @@ import AdminDashboard from './pages/OrgainzerDashboard/AdminDash.jsx';
 import CreateProject from './pages/OrgainzerDashboard/AddProject.jsx';
 import OrgSignup from './pages/OrgainzerDashboard/AdminSignup.jsx';
 import EmployeeSignup from './pages/OrgainzerDashboard/EmployeeSignUp.jsx';
+import EmployeeRegistration from './pages/OrgainzerDashboard/EmployeeRegister.jsx';
 
 const router = createBrowserRouter([
   {
@@ -45,7 +46,7 @@ const router = createBrowserRouter([
         element: <FreelancerSignup />
       },
       {
-        path: "/dashboard/freelancer",
+        path: "/dashboard/freelancer/:id",
         element: <FreelancerDashboard />
       },
       {
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
         element: <OrganizerDashboard />
       },
       {
-        path: "/admin/dashboard",
+        path: "/admin/dashboard/",
         element: <AdminDashboard />
       },
       {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
       {
         path: "signup/emp",
         element: <EmployeeSignup />
+      },
+      {
+        path:"employee/register",
+        element: <EmployeeRegistration />
       }
     ]
   }
