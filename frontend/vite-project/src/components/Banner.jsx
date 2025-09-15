@@ -39,21 +39,21 @@ const Banner = () => {
 
   return (
     <div className="relative w-full h-80 bg-gray-100 overflow-hidden rounded-lg shadow-md">
-      <div className="absolute left-0 top-0 h-full w-1/3 flex items-center justify-center">
+      {/* <div className="absolute left-0 top-0 h-full w-1/3 flex items-center justify-center">
         <img 
           src="/" 
           alt="Left banner image" 
           className="max-h-full max-w-full object-contain"
         />
-      </div>
+      </div> */}
 
-      <div className="absolute right-0 top-0 h-full w-1/3 flex items-center justify-center">
+      {/* <div className="absolute right-0 top-0 h-full w-1/3 flex items-center justify-center">
         <img 
           src="/api/placeholder/400/500" 
           alt="Right banner image" 
           className="max-h-full max-w-full object-contain"
         />
-      </div>
+      </div> */}
 
       <div className="absolute left-1/3 right-1/3 top-0 bottom-0 flex items-center justify-center">
         <div 

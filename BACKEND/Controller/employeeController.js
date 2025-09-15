@@ -142,4 +142,24 @@ const loginEmployee = async (req, res) => {
     }
   };
 
-module.exports = {registerEmployee, loginEmployee, updateCheckpoint};
+  const getAllEmployees = async (req, res) => {
+    const { orgCode } = req.params;
+    try {
+      // Get all employees for the organization with only necessary fields
+      const employees = await Employee.find({ requestCode: orgCode }, {
+        name: 1,
+        workEmail: 1,
+        department: 1,
+        joiningDate: 1,
+        description: 1,
+        profilePicture: 1
+      });
+      
+      res.status(200).json(employees);
+    } catch (error) {
+      console.error("Error getting employees:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
+module.exports = {registerEmployee, loginEmployee, updateCheckpoint, getAllEmployees};

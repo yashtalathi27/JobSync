@@ -85,35 +85,41 @@ const loginOrg=async(req,res)=>{
 
 const createProject=async(req,res)=>{
       console.log(req.body);
-      const id= req.body.projectId;
-      const name=req.body.name;
-      const description=req.body.description;
-      const freelancer=req.body.freelancer;
-      const organization=req.body.organization;
-      const employee=req.body.employee;
-
-      console.log(id, name, description, freelancer, organization, employee);
+      const { projectData } = req.body;
+      
       try{
-            const project=new Project({
-                  projectId: id,
-                  name: name,
-                  description: description,
-                  freelancer: freelancer,
-                  organization: organization,
-                  employee: employee,
-                  budget: req.body.budget,
-                  total_checkpoints: req.body.total_checkpoints,
-                  checkpoints: req.body.checkpoints,
-                  createdAt: req.body.createdAt,
-                  deadline: req.body.deadline,
+            // Validate required fields
+            if (!projectData.name) {
+                  return res.status(400).json({message: "Project name is required"});
+            }
+            if (!projectData.checkpoints || projectData.checkpoints.length === 0) {
+                  return res.status(400).json({message: "At least one checkpoint is required"});
+            }
+            if (!projectData.deadline) {
+                  return res.status(400).json({message: "Project deadline is required"});
+            }
 
+            const project=new Project({
+                  name: projectData.name,
+                  description: projectData.description,
+                  freelancer: projectData.freelancer,
+                  organization: projectData.organization,
+                  employee: projectData.employee,
+                  budget: projectData.budget,
+                  total_checkpoints: projectData.checkpoints.length,
+                  checkpoints: projectData.checkpoints,
+                  deadline: projectData.deadline,
             });
             await project.save();
-            res.status(201).json({message: "Project created successfully", success: true});
+            res.status(201).json({
+                  message: "Project created successfully", 
+                  success: true,
+                  project: project
+            });
       }
       catch(error){
             console.error("Error during project creation:", error);
-            res.status(500).json({message: "Internal Server Error"});
+            res.status(500).json({message: "Internal Server Error", error: error.message});
       }
 };
 
