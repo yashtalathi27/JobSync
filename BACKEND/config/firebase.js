@@ -38,7 +38,12 @@ async function googleAuth(req, res) {
     if (user) {
       return res.json({
         message: "User already registered",
-        sucess: true,   
+        success: true,
+        freelancer: {
+          id: user.freelancerId || user._id,
+          name: user.name,
+          email: user.email
+        }
     });
     }
     
@@ -50,10 +55,17 @@ async function googleAuth(req, res) {
     // const token = await generateJWT({ email: newUser.email, id: newUser._id });
     return res.json({
       message: "User registered in successfully",
-      sucess: true,
-    
+      success: true,
+      freelancer: {
+        id: newUser.freelancerId || newUser._id,
+        name: newUser.name,
+        email: newUser.email
+      }
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in Google Auth:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
 module.exports = {

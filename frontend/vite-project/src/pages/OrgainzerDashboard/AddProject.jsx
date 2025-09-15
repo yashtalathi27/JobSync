@@ -115,113 +115,57 @@ export default function CreateProject() {
     organization: organization,
   });
 
-  // Fetch freelancers and employees data
-
+  // Debug: Log form data changes
   useEffect(() => {
-    // Hardcoded freelancer data with new ID format
-    setFreelancers([
-      { 
-        _id: "f1", 
-        id: "frl1001",
-        name: "Alex Johnson", 
-        specialization: "Web Development", 
-        hourlyRate: 45,
-        availability: "Available immediately"
-      },
-      { 
-        _id: "f2", 
-        id: "frl1002",
-        name: "Sarah Williams", 
-        specialization: "Mobile Development", 
-        hourlyRate: 50,
-        availability: "Available in 2 weeks"
-      },
-      { 
-        _id: "f3", 
-        id: "frl1003",
-        name: "Michael Chen", 
-        specialization: "UI/UX Design", 
-        hourlyRate: 40,
-        availability: "Available immediately"
-      },
-      { 
-        _id: "f4", 
-        id: "frl1004",
-        name: "Priya Patel", 
-        specialization: "Backend Development", 
-        hourlyRate: 55,
-        availability: "Available immediately"
-      },
-      { 
-        _id: "f5", 
-        id: "frl1005",
-        name: "David Rodriguez", 
-        specialization: "Full Stack Development", 
-        hourlyRate: 60,
-        availability: "Available next week"
-      },
-      { 
-        _id: "f6", 
-        id: "frl1006",
-        name: "Emma Thompson", 
-        specialization: "Content Writing", 
-        hourlyRate: 35,
-        availability: "Available immediately"
-      },
-    ]);
-    
-    // Hardcoded employee data with new ID format
-    setEmployees([
-      { 
-        _id: "e1", 
-        id: "emp101",
-        name: "Emily Davis", 
-        department: "Development", 
-        position: "Senior Developer",
-        availability: "Available 20 hrs/week"
-      },
-      { 
-        _id: "e2", 
-        id: "emp102",
-        name: "James Wilson", 
-        department: "Design", 
-        position: "UI Designer",
-        availability: "Available 30 hrs/week"
-      },
-      { 
-        _id: "e3", 
-        id: "emp103",
-        name: "Olivia Brown", 
-        department: "Marketing", 
-        position: "Content Specialist",
-        availability: "Available 25 hrs/week"
-      },
-      { 
-        _id: "e4", 
-        id: "emp104",
-        name: "Robert Lee", 
-        department: "Development", 
-        position: "Backend Engineer",
-        availability: "Available 15 hrs/week"
-      },
-      { 
-        _id: "e5", 
-        id: "emp105",
-        name: "Sophia Martinez", 
-        department: "Design", 
-        position: "UX Researcher",
-        availability: "Available 20 hrs/week"
-      },
-      { 
-        _id: "e6", 
-        id: "emp106",
-        name: "William Taylor", 
-        department: "Product", 
-        position: "Product Manager",
-        availability: "Available 10 hrs/week"
-      },
-    ]);
-  }, []);
+    console.log("FormData updated:", formData);
+    console.log("Button should be enabled:", !!(formData.freelancer && formData.employee));
+  }, [formData]);
+
+  // Fetch freelancers and employees data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch freelancers
+        const freelancersResponse = await axios.get("http://localhost:5000/api/freelancer/all");
+        const freelancersData = freelancersResponse.data.map(freelancer => ({
+          _id: freelancer._id,
+          id: freelancer.freelancerId || freelancer._id,
+          name: freelancer.name || 'Name not provided',
+          specialization: freelancer.skills?.join(', ') || 'Skills not specified',
+          hourlyRate: 40, // Default rate - could be added to schema later
+          availability: freelancer.availability ? "Available" : "Busy",
+          email: freelancer.email,
+          address: freelancer.address,
+          experience: freelancer.pastExperience
+        }));
+        setFreelancers(freelancersData);
+
+        // Fetch employees for the organization
+        if (organization) {
+          const employeesResponse = await axios.get(`http://localhost:5000/api/employee/all/${organization}`);
+          const employeesData = employeesResponse.data.map(employee => ({
+            _id: employee._id,
+            id: employee._id, // Using MongoDB _id as display ID
+            name: employee.name,
+            department: employee.department,
+            position: employee.description || 'Position not specified',
+            availability: "Available", // Default - could be tracked separately
+            email: employee.workEmail,
+            joiningDate: employee.joiningDate
+          }));
+          setEmployees(employeesData);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Fallback to empty arrays if API fails
+        setFreelancers([]);
+        setEmployees([]);
+        alert("Failed to load freelancers and employees. Please check your connection and try again.");
+      }
+    };
+
+    fetchData();
+  }, [organization]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -247,10 +191,10 @@ export default function CreateProject() {
   };
 
   const handleFreelancerSelect = (freelancer) => {
-    setFormData({ ...formData, freelancer: freelancer._id });
-    // Store the selected freelancer name for display
+    console.log("Freelancer selected:", freelancer);
     setFormData(prev => ({ 
       ...prev, 
+      freelancer: freelancer._id,
       freelancerName: freelancer.name,
       freelancerId: freelancer.id,
       freelancerSpecialization: freelancer.specialization,
@@ -259,10 +203,10 @@ export default function CreateProject() {
   };
 
   const handleEmployeeSelect = (employee) => {
-    setFormData({ ...formData, employee: employee._id });
-    // Store the selected employee name for display
+    console.log("Employee selected:", employee);
     setFormData(prev => ({ 
       ...prev, 
+      employee: employee._id,
       employeeName: employee.name,
       employeeId: employee.id,
       employeeDepartment: employee.department,
@@ -273,15 +217,57 @@ export default function CreateProject() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log("Form submitted! Current form data:", formData);
+    console.log("Checkpoints:", checkpoints);
+    
+    // Validate required fields
+    if (!formData.freelancer) {
+      alert("Please select a freelancer");
+      return;
+    }
+    
+    // if (!formData.employee) {
+    //   alert("Please select an employee");
+    //   return;
+    // }
+    
+    if (!formData.name.trim()) {
+      alert("Please enter a project name");
+      return;
+    }
+    
+    if (!formData.description.trim()) {
+      alert("Please enter a project description");
+      return;
+    }
+    
+    if (!formData.budget || Number(formData.budget) <= 0) {
+      alert("Please enter a valid budget amount");
+      return;
+    }
+    
     // Calculate total checkpoint amounts to ensure they match budget
     const totalCheckpointAmount = checkpoints.reduce(
-      (sum, checkpoint) => sum + Number(checkpoint.amount),
+      (sum, checkpoint) => sum + Number(checkpoint.amount || 0),
       0
     );
     
     if (totalCheckpointAmount !== Number(formData.budget)) {
-      alert("Total checkpoint amounts must equal the project budget");
+      alert(`Total checkpoint amounts (${totalCheckpointAmount}) must equal the project budget (${formData.budget})`);
       return;
+    }
+    
+    // Validate that all checkpoints have required fields
+    for (let i = 0; i < checkpoints.length; i++) {
+      const checkpoint = checkpoints[i];
+      if (!checkpoint.title.trim()) {
+        alert(`Please enter a title for checkpoint ${i + 1}`);
+        return;
+      }
+      if (!checkpoint.amount || Number(checkpoint.amount) <= 0) {
+        alert(`Please enter a valid amount for checkpoint ${i + 1}`);
+        return;
+      }
     }
     
     // Create final project object
@@ -295,17 +281,27 @@ export default function CreateProject() {
     };
 
     console.log("Submitting project:", projectData);
-    const res=await axios.post("http://localhost:5000/api/organization/createProject",
-    { projectData }); 
-    console.log(res);
     
-    // API call would go here
-    
-    // Navigate back to projects list after successful creation
-    // navigate("/org/admin");
-    
-    // For demo purposes, just show success message
-    alert("Project created successfully!");
+    try {
+      const res = await axios.post("http://localhost:5000/api/organization/createProject", { projectData }); 
+      console.log("Project created successfully:", res.data);
+      
+      if (res.data.success) {
+        alert("Project created successfully!");
+        // Navigate back to admin dashboard
+        navigate("/admin/dashboard/");
+      } else {
+        alert("Failed to create project. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating project:", error);
+      
+      if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert("Failed to create project. Please check your internet connection and try again.");
+      }
+    }
   };
 
   return (
@@ -552,7 +548,7 @@ export default function CreateProject() {
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              disabled={!formData.freelancer || !formData.employee}
+              disabled={false}
             >
               Create Project
             </button>

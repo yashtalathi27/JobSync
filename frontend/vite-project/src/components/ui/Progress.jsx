@@ -4,24 +4,48 @@ const Progress = ({ value, max = 100, checkpoints = [] }) => {
   return (
     <div className="relative w-full mt-2">
       {/* Checkpoint Labels with Lines */}
-      <div className="relative h-6 mb-2">
-        {checkpoints.map((checkpoint, index) => (
-          <div key={index} className="absolute flex flex-col items-center text-xs text-gray-700"
-            style={{
-              left: `calc(${checkpoint.length}% - 10px)`,
-              top: "-16px",
-              whiteSpace: "nowrap",
-            }}>
-            <span className="mt-2">{checkpoint.title}</span>
-            {/* Vertical Line */}
-            <div className="w-[2px] h-5 bg-gray-500 mt-1"></div>
-          </div>
-        ))}
-      </div>
+      {checkpoints.length > 0 && (
+        <div className="relative h-6 mb-2">
+          {checkpoints.map((checkpoint, index) => {
+            const position = ((index + 1) / checkpoints.length) * 100;
+            return (
+              <div 
+                key={index} 
+                className="absolute flex flex-col items-center text-xs text-gray-700"
+                style={{
+                  left: `calc(${position}% - 10px)`,
+                  top: "-16px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <span className="mt-2" title={checkpoint.description}>
+                  {checkpoint.title || `Step ${index + 1}`}
+                </span>
+                {/* Vertical Line */}
+                <div 
+                  className={`w-[2px] h-5 mt-1 ${
+                    checkpoint.completed ? 'bg-green-500' : 'bg-gray-500'
+                  }`}
+                ></div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 rounded-full h-3 relative">
-        <div className="bg-blue-600 h-3 rounded-full transition-all" style={{ width: `${(value / max) * 100}%` }}></div>
+        <div 
+          className="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+          style={{ width: `${Math.min((value / max) * 100, 100)}%` }}
+        ></div>
+        
+        {/* Progress percentage text */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-medium text-white mix-blend-difference">
+            {Math.round(value)}%
+          </span>
+        </div>
       </div>
     </div>
   );

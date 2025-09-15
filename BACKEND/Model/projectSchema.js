@@ -19,7 +19,7 @@ const projectSchema=new mongoose.Schema({
       type:String,
       required:false,
     },
-    orgnization:
+    organization:
     {
       type:String,
       required:false,

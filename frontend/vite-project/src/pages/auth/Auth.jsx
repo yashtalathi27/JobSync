@@ -17,7 +17,10 @@ function Auth({ type }) {
   console.log(res);
   if (res.data?.success) {
     toast.success(res.data.message);
-    navigate("/dashboard");
+    // Store freelancer data for future use
+    localStorage.setItem("freelancerData", JSON.stringify(res.data.freelancer));
+    // Redirect to freelancer dashboard with their ID
+    navigate(`/dashboard/freelancer/${res.data.freelancer.id}`);
   } else {
     toast.error(res.data?.message);
     navigate("/login");
@@ -32,21 +35,16 @@ function Auth({ type }) {
       const res = await axios.post("http://localhost:5000/api/freelancer/google-auth", {
         accessToken,
       });
-      // localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      // dispatch(googleSlice(res.data.user));
-      // dispatch(login(res.data.user))
       console.log(res);
 
-      if (res.data?.sucess) {
-        // toast.success(res.data.message);
-        navigate("/dashboard");
+      if (res.data?.success) {
+        // Store freelancer data and redirect
+        localStorage.setItem("freelancerData", JSON.stringify(res.data.freelancer));
+        navigate(`/dashboard/freelancer/${res.data.freelancer.id}`);
       } else {
-        // toast.error(res.data?.message);
         navigate("/login");
       }
     } catch (error) {
-      // Log and display an error if something goes wrong.
       console.error(
         "Error during Google Authentication:",
         error.response?.data || error.message

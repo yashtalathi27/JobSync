@@ -29,3 +29,4 @@ async def websocket_endpoint(websocket: WebSocket, role: str, username: str):
             await manager.broadcast(data["message"], data["sender"], role)
     except WebSocketDisconnect:
         manager.disconnect(websocket, role)
+
